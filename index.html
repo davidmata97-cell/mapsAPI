@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="style.css"/>
+    <title>Map</title>
+</head>
+<body>
+    <div id="selector">
+        <select id="citySelector">
+            <option value="" selected="true" disabled>Seleccione una opción</option>
+            <option value="leon">León</option>
+            <option value="ny">New York</option>
+            <option value="london">London</option>
+            <option value="tokyo">Tokyo</option>
+            <option value="cairo">Cairo</option>
+            <option value="pripiat">Pripiat</option>
+        </select>
+    </div>
+
+    <div id="map" class="container-fluid">
+    </div>
+
+    <script src="script.js"></script>
+    <script async src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBtY4PvtVjezWB733NxOKVxBPSq8-HmIEI&callback=initMap"></script>
+</body>
+</html>
