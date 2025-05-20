@@ -83,6 +83,21 @@ function showCityMarkers(cityData, map){
                 scaledSize: new google.maps.Size(40, 40)
             }
         });
+
+        google.maps.event.addListener(marker, 'mouseover', function() {
+            marker.setIcon({
+                url: iconUrl,
+                scaledSize: new google.maps.Size(50, 50)
+            });
+        });
+
+        google.maps.event.addListener(marker, 'mouseout', function() {
+            marker.setIcon({
+                url: iconUrl,
+                scaledSize: new google.maps.Size(40, 40)
+            });
+        });
+
         markersArray.push(marker);
     });
 
