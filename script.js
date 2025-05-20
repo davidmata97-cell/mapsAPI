@@ -44,6 +44,7 @@ const citiesArray = {
         ] }
 };
 
+//function used to initialize the map
 function initMap(){
     let map = new google.maps.Map(document.getElementById("map"), {
         center: {lat: 40, lng: -4},
@@ -53,6 +54,7 @@ function initMap(){
     document.getElementById('citySelector').addEventListener("change", () => selectCity(map));
 }
 
+//function used to recognise the selected city
 function selectCity(map){
     const city = document.getElementById('citySelector').value;
     const cityData = citiesArray[city];
@@ -65,6 +67,7 @@ function selectCity(map){
     showCityMarkers(cityData, map);
 }
 
+//function used to show the city markers.
 function showCityMarkers(cityData, map){
     markersArray.forEach(marker => marker.setMap(null));
     markersArray = [];
@@ -89,6 +92,14 @@ function showCityMarkers(cityData, map){
                 url: iconUrl,
                 scaledSize: new google.maps.Size(50, 50)
             });
+
+            const infoWindow = new google.maps.InfoWindow({
+            content: `<strong>${place.name}</strong>`
+            });
+
+            marker.addListener("click", () => {
+            infoWindow.open(map, marker);
+            });
         });
 
         google.maps.event.addListener(marker, 'mouseout', function() {
@@ -101,11 +112,4 @@ function showCityMarkers(cityData, map){
         markersArray.push(marker);
     });
 
-    const infoWindow = new google.maps.InfoWindow({
-          content: `<strong>${place.name}</strong>`
-        });
-
-        marker.addListener("click", () => {
-          infoWindow.open(map, marker);
-    });
 }
