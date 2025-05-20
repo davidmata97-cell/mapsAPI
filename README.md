@@ -1,30 +1,49 @@
 # mapsAPI
+# Sesión 1  Insertar un mapa. 19/05/2025
 
-coordenadas leon: 	42.59837707420699, -5.572262630568071
-    catedral: 42.59994435948316, -5.566849526778652
-    san isidoro: 42.601113156742585, -5.574175260572066
-    botines: 42.59848446306551, -5.570600476902626
-    reino de leon: 42.587871665709784, -5.578054825783137
-    San Marcos: 42.6020846664975, -5.583003763388863
+## Resumen
+- Desde la última hora de clase se realizó la explicación de la práctica. Conseguimos la API e insertamos el mapa en la página.
 
-coordenadas new york: 40.71332972092159, -73.9974384174848
-    estatua libertad: 40.68808704353666, -74.04701364162626
-    central park: 40.78185986104491, -73.96727467273226
-    world trade center: 40.71335207561017, -74.01332510042107
-    yankee stadium: 40.82979593794083, -73.92564009309434
-    brooklyn bridge: 40.7062578978129, -73.99760359730269
+## Dificultades encontradas
+- 
 
-cairo: 30.06770173796836, 31.39241281827669
-    piramides de ghiza: 29.96812427397199, 31.130625449698343
-    ciudadela del cairo: 30.027628896278575, 31.258986839593348
-    mosque of sadiyya zainab: 30.032336485333094, 31.244172967205724
-    the egyptian museum in cairo: 30.04915182025578, 31.234026828962595
-    Abdin palace: 30.044440685434278, 31.25073607929101
+## Soluciones aplicadas
+- 
 
-london: 51.506184776422145, -0.12908236234619108
-    wimblendon: 51.439078956130075, -0.2031305576660504
-    hyde park: 51.50708312743701, -0.16055853681072513
-    buckingham: 51.50146909547011, -0.139491235847841
-    tower of london: 51.50809382682526, -0.07460323631835336
-    big ben: 51.5010725467263, -0.12490608605256379
+## Fuentes consultadas
+- Apuntes vistos en clases anteriores
+
+## Decisiones técnicas
+- 
+
+## Ideas de mejora futura
+- 
+
+
+
+# Sesión 2 Personalizar el mapa. 20/05/2025
+
+## Resumen
+- Hoy hemos realizado el script, el formulario y el css de la práctica. Se han almacenado las ciudades y sus respectivas coordenadas, así como sus ubicaciones elegidas y las coordenadas de estas. 
+Hemos insertado también los iconos para cada lugar elegido.
+
+## Dificultades encontradas
+- Iconos personalizados
+- Función hover iconos
+
+## Soluciones aplicadas
+- Uso de 'icon' dentro de la declaración del marker con la url de la imagen descargada.
+- uso de dos EventListener, uno para cuando nos colocamos encima y otro para cuando quitamos el ratón de encima.
+
+## Fuentes consultadas
+- Apuntes vistos en clases anteriores
+- https://developer.mozilla.org/es/docs/Web/API/Window/open
+- https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/browserAction/setIcon
+- https://developers.google.com/earth-engine/apidocs/map-setcenter
+
+## Decisiones técnicas
+- Decidimos poner el select en la esquina superior izquierda porque estéticamente es mejor.
+
+## Ideas de mejora futura
+- Introducir los nombres de los markers al lado.
 
