@@ -1,4 +1,4 @@
-var ubi;
+var map;
 var markersArray = [];
 var cityMarkersArray = [];
 const citiesArray = {
@@ -48,16 +48,17 @@ const citiesArray = {
 
 //function used to initialize the map
 function initMap(){
-    let map = new google.maps.Map(document.getElementById("map"), {
+    map = new google.maps.Map(document.getElementById("map"), {
         center: {lat: 40, lng: -4},
         zoom:6.5,
     });
 
-    document.getElementById('citySelector').addEventListener("change", () => selectCity(map));
+    document.getElementById('citySelector').addEventListener("change", selectCity);
+    document.getElementById('add').addEventListener('click', newMarker);
 }
 
 //function used to recognise the selected city
-function selectCity(map){
+function selectCity(){
     const city = document.getElementById('citySelector').value;
     const cityData = citiesArray[city];
 
@@ -115,6 +116,33 @@ function showCityMarkers(cityData, map){
     });
 }
 
-function ubiText(){
-    ubi = document.getElementById('ubi').value;
+function newMarker(){
+    const location = document.getElementById('location').value;
+    const category = document.getElementById('category').value;
+
+    if(location.trim() == "" || category === ""){
+        alert('You must add a location and a category');
+        return;
+    }
+
+    ubiText(location, category);
+
+}
+
+function ubiText(location, category){
+    const geocoder = new google.maps.Geocoder();
+
+    geocoder.geocode({address:location}, (results,status) => {
+        if ( status==='OK'){
+            map.setCenter(results[0].geometry.location);
+            const marker = new google.maps.Marker({
+                map:map,
+                position: results[0].geometry.location,
+            });
+            markersArray.push(marker);
+        }else{
+            alert("Geocoding failed: " + status);
+        }
+
+    });
 }
