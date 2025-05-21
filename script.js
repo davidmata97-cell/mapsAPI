@@ -1,4 +1,6 @@
+var map;
 var markersArray = [];
+var cityMarkersArray = [];
 const citiesArray = {
     leon:    { lat: 42.5984, lng: -5.5725, zoom: 15, 
         places: [{name:"Cathedral",type:"church", lat:42.59944, lng:-5.56717}, 
@@ -46,16 +48,54 @@ const citiesArray = {
 
 //function used to initialize the map
 function initMap(){
-    let map = new google.maps.Map(document.getElementById("map"), {
+    map = new google.maps.Map(document.getElementById("map"), {
         center: {lat: 40, lng: -4},
         zoom:6.5,
     });
 
-    document.getElementById('citySelector').addEventListener("change", () => selectCity(map));
+    const selector = document.getElementById('citySelector');
+    
+    let lastSelected = "";
+
+    selector.addEventListener("click", () => {
+        if (selector.value === lastSelected && selector.value !== "") {
+            selectCity(selector.value);
+        }
+    });
+
+    selector.addEventListener("change", () => {
+        lastSelected = selector.value;
+        selectCity(selector.value);
+    });
+
+    document.getElementById('add').addEventListener('click', newMarker);
+    document.getElementById('delete').addEventListener('click',  () => {
+        deleteMarker(markersArray); 
+        deleteMarker(cityMarkersArray);
+        localStorage.removeItem("markers");
+
+        map.setCenter({ lat: 40, lng: -4 });
+        map.setZoom(6.5);
+
+        
+        document.getElementById('citySelector').value = "";
+        document.getElementById('categoryFilter').value = "";
+
+    });
+
+    document.getElementById('categoryFilter').addEventListener('change', () => {
+        const category = document.getElementById('categoryFilter').value;
+        filterMarkersByCategory(category);
+    });
+
+
+    loadMarkersFromLocalStorage();
+
+
 }
 
 //function used to recognise the selected city
-function selectCity(map){
+function selectCity(){
     const city = document.getElementById('citySelector').value;
     const cityData = citiesArray[city];
 
@@ -65,51 +105,174 @@ function selectCity(map){
     }
 
     showCityMarkers(cityData, map);
+    
+    const currentFilter = document.getElementById('categoryFilter').value;
+    filterMarkersByCategory(currentFilter);
 }
 
 //function used to show the city markers.
 function showCityMarkers(cityData, map){
-    markersArray.forEach(marker => marker.setMap(null));
-    markersArray = [];
+    deleteMarker(cityMarkersArray);
 
     if (!cityData.places) return;
 
     cityData.places.forEach(place => {
-        const iconUrl = `img/${place.type}.png`;
+        const marker = showIcons(place);
 
-        let marker = new google.maps.Marker({
-            position: {lat: place.lat, lng: place.lng},
-            title: place.name,
-            map: map,
-            icon: {
-                url: iconUrl,
-                scaledSize: new google.maps.Size(40, 40)
-            }
+        cityMarkersArray.push(marker);
+    });
+}
+
+//function used to show the diferent icons for each category
+function showIcons(place){
+    const type = place.type && place.type.trim() !== "" ? place.type : "default";
+    const iconUrl = `img/${type}.png`;
+
+    let marker = new google.maps.Marker({
+        position: {lat: place.lat, lng: place.lng},
+        title: place.name,
+        map: map,
+        icon: {
+            url: iconUrl,
+            scaledSize: new google.maps.Size(40, 40)
+        }
+    });
+
+    marker.type = type;
+
+    google.maps.event.addListener(marker, 'mouseover', function() {
+        marker.setIcon({
+            url: iconUrl,
+            scaledSize: new google.maps.Size(50, 50)
         });
 
-        google.maps.event.addListener(marker, 'mouseover', function() {
-            marker.setIcon({
-                url: iconUrl,
-                scaledSize: new google.maps.Size(50, 50)
+        const infoWindow = new google.maps.InfoWindow({
+        content: `<strong>${place.name}</strong>`
+        });
+
+        marker.addListener("click", () => {
+        infoWindow.open(map, marker);
+        });
+
+    });
+
+    google.maps.event.addListener(marker, 'mouseout', function() {
+        marker.setIcon({
+            url: iconUrl,
+            scaledSize: new google.maps.Size(40, 40)
+        });
+    });
+
+    return marker;
+}
+
+//function used to start a new marker
+function newMarker(){
+    const location = document.getElementById('location').value;
+    const category = document.getElementById('category').value;
+
+    if(location.trim() == ""){
+        alert('You must add a location and a category');
+        return;
+    }
+
+    createMarker(location, category);
+
+}
+
+//function used to create a marker
+function createMarker(location, category){
+    const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(location)}`;
+
+    fetch(url, {
+        headers: {
+            'User-Agent': 'MiAppMapa/1.0 (grupoe@gmail.com)'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.length > 0) {
+            const lat = parseFloat(data[0].lat);
+            const lon = parseFloat(data[0].lon);
+
+            const place = {
+                name: location,
+                type: category,
+                lat: lat,
+                lng: lon
+            };
+
+            const marker = showIcons(place);
+            
+            markersArray.push(marker);
+            saveMarkersToLocalStorage();
+
+            map.setCenter({ lat, lng: lon });
+            map.setZoom(12);
+
+        }else{
+            alert("Results not found");
+        }
+    })
+    .catch(error => {
+        alert("It's not posible to catch the coords.");
+        console.error(error);
+    });
+}
+
+//function used to save the markers into the localStorage
+function saveMarkersToLocalStorage(){
+    localStorage.setItem("markers", JSON.stringify(markersArray.map(marker => ({
+        position: {
+            lat: marker.getPosition().lat(),
+            lng: marker.getPosition().lng()
+        },
+        title: marker.getTitle(),
+        icon: marker.getIcon().url,
+        type: marker.type
+    }))));
+}
+
+//function used to load the markers from the localStorage
+function loadMarkersFromLocalStorage() {
+    const storedMarkers = JSON.parse(localStorage.getItem("markers"));
+    if (storedMarkers && Array.isArray(storedMarkers)) {
+        storedMarkers.forEach(stored => {
+            const marker = new google.maps.Marker({
+                position: stored.position,
+                title: stored.title,
+                map: map,
+                icon: {
+                    url: stored.icon,
+                    scaledSize: new google.maps.Size(40, 40)
+                }
             });
 
             const infoWindow = new google.maps.InfoWindow({
-            content: `<strong>${place.name}</strong>`
+                content: `<strong>${stored.title}</strong>`
             });
+            marker.addListener("click", () => infoWindow.open(map, marker));
 
-            marker.addListener("click", () => {
-            infoWindow.open(map, marker);
-            });
+            markersArray.push(marker);
         });
+    }
+}
 
-        google.maps.event.addListener(marker, 'mouseout', function() {
-            marker.setIcon({
-                url: iconUrl,
-                scaledSize: new google.maps.Size(40, 40)
-            });
-        });
+//function used to clean the map and delete all the markers
+function deleteMarker(array){
+    array.forEach(marker => marker.setMap(null));
+    array.length = 0;
+}
 
-        markersArray.push(marker);
+//function used to filter the markers by category
+function filterMarkersByCategory(category) {
+    markersArray.forEach(marker => {
+        const type = marker.type;
+        marker.setVisible(category === "" || type === category);
     });
 
+    cityMarkersArray.forEach(marker => {
+        const type = marker.type;
+        marker.setVisible(category === "" || type === category);
+    });
 }

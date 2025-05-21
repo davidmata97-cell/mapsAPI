@@ -9,7 +9,7 @@
 <body>
     <div id="selector">
         <select id="citySelector">
-            <option value="" selected="true" disabled>Seleccione una opción</option>
+            <option value="" selected="true" disabled>Select a city</option>
             <option value="leon">León</option>
             <option value="ny">New York</option>
             <option value="london">London</option>
@@ -18,11 +18,43 @@
             <option value="pripiat">Pripiat</option>
         </select>
     </div>
+    <div id="newUbi">
+        <input type="text" id="location" placeholder="Introduce a location"/>
+        <select id="category">
+            <option value="" disabled selected="true">Select a category</option>
+            <option value="city">City</option>
+            <option value="monument">Monument</option>
+            <option value="castle">Castle</option>
+            <option value="church">Church</option>
+            <option value="park">Park</option>
+            <option value="stadium">Stadium</option>
+            <option value="bridge">Bridge</option>
+            <option value="pyramid">Pyramid</option>
+            <option value="radiation">Radiation</option>
+        </select>
+        <button id="add">Add</button>
+        <button id="delete">Delete</button>
+    </div>
+    <div id="filter">
+        <select id="categoryFilter">
+            <option value="">-- Show All --</option>
+            <option value="default">Default</option>
+            <option value="city">City</option>
+            <option value="church">Church</option>
+            <option value="monument">Monument</option>
+            <option value="stadium">Stadium</option>
+            <option value="bridge">Bridge</option>
+            <option value="park">Park</option>
+            <option value="castle">Castle</option>
+            <option value="pyramid">Pyramid</option>
+            <option value="radiation">Radiation</option>
+        </select>
+    </div>
 
     <div id="map" class="container-fluid">
     </div>
 
     <script src="script.js"></script>
-    <script async src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBtY4PvtVjezWB733NxOKVxBPSq8-HmIEI&callback=initMap"></script>
+    <script async src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCxNMjdODJxCXFbIzp6djXGUkxWEaktAvI&callback=initMap"></script>
 </body>
 </html>
