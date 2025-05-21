@@ -276,4 +276,3 @@ function filterMarkersByCategory(category) {
         marker.setVisible(category === "" || type === category);
     });
 }
-
