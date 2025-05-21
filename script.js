@@ -55,6 +55,15 @@ function initMap(){
 
     document.getElementById('citySelector').addEventListener("change", selectCity);
     document.getElementById('add').addEventListener('click', newMarker);
+    document.getElementById('delete').addEventListener('click',  () => {
+        deleteMarker(markersArray); 
+        deleteMarker(cityMarkersArray);
+        localStorage.removeItem("markers");
+    });
+
+    loadMarkersFromLocalStorage();
+
+
 }
 
 //function used to recognise the selected city
@@ -72,77 +81,147 @@ function selectCity(){
 
 //function used to show the city markers.
 function showCityMarkers(cityData, map){
-    cityMarkersArray.forEach(marker => marker.setMap(null));
-    cityMarkersArray = [];
+    deleteMarker(cityMarkersArray);
 
     if (!cityData.places) return;
 
     cityData.places.forEach(place => {
-        const iconUrl = `img/${place.type}.png`;
-
-        let marker = new google.maps.Marker({
-            position: {lat: place.lat, lng: place.lng},
-            title: place.name,
-            map: map,
-            icon: {
-                url: iconUrl,
-                scaledSize: new google.maps.Size(40, 40)
-            }
-        });
-
-        google.maps.event.addListener(marker, 'mouseover', function() {
-            marker.setIcon({
-                url: iconUrl,
-                scaledSize: new google.maps.Size(50, 50)
-            });
-
-            const infoWindow = new google.maps.InfoWindow({
-            content: `<strong>${place.name}</strong>`
-            });
-
-            marker.addListener("click", () => {
-            infoWindow.open(map, marker);
-            });
-        });
-
-        google.maps.event.addListener(marker, 'mouseout', function() {
-            marker.setIcon({
-                url: iconUrl,
-                scaledSize: new google.maps.Size(40, 40)
-            });
-        });
+        const marker = showIcons(place);
 
         cityMarkersArray.push(marker);
     });
+}
+
+function showIcons(place){
+    const type = place.type && place.type.trim() !== "" ? place.type : "default";
+    const iconUrl = `img/${type}.png`;
+
+    let marker = new google.maps.Marker({
+        position: {lat: place.lat, lng: place.lng},
+        title: place.name,
+        map: map,
+        icon: {
+            url: iconUrl,
+            scaledSize: new google.maps.Size(40, 40)
+        }
+    });
+
+    google.maps.event.addListener(marker, 'mouseover', function() {
+        marker.setIcon({
+            url: iconUrl,
+            scaledSize: new google.maps.Size(50, 50)
+        });
+
+        const infoWindow = new google.maps.InfoWindow({
+        content: `<strong>${place.name}</strong>`
+        });
+
+        marker.addListener("click", () => {
+        infoWindow.open(map, marker);
+        });
+
+    });
+
+    google.maps.event.addListener(marker, 'mouseout', function() {
+        marker.setIcon({
+            url: iconUrl,
+            scaledSize: new google.maps.Size(40, 40)
+        });
+    });
+
+    return marker;
+
 }
 
 function newMarker(){
     const location = document.getElementById('location').value;
     const category = document.getElementById('category').value;
 
-    if(location.trim() == "" || category === ""){
+    if(location.trim() == ""){
         alert('You must add a location and a category');
         return;
     }
 
-    ubiText(location, category);
+    getCoords(location, category);
 
 }
 
-function ubiText(location, category){
-    const geocoder = new google.maps.Geocoder();
+function getCoords(location, category){
+    const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(location)}`;
 
-    geocoder.geocode({address:location}, (results,status) => {
-        if ( status==='OK'){
-            map.setCenter(results[0].geometry.location);
-            const marker = new google.maps.Marker({
-                map:map,
-                position: results[0].geometry.location,
-            });
-            markersArray.push(marker);
-        }else{
-            alert("Geocoding failed: " + status);
+    fetch(url, {
+        headers: {
+            'User-Agent': 'MiAppMapa/1.0 (grupoe@gmail.com)'
         }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.length > 0) {
+            const lat = parseFloat(data[0].lat);
+            const lon = parseFloat(data[0].lon);
 
+            const place = {
+                name: location,
+                type: category,
+                lat: lat,
+                lng: lon
+            };
+
+            const marker = showIcons(place);
+            
+            markersArray.push(marker);
+            saveMarkersToLocalStorage();
+
+            map.setCenter({ lat, lng: lon });
+            map.setZoom(12);
+
+        }else{
+            alert("Results not found");
+        }
+    })
+    .catch(error => {
+        alert("It's not posible to catch the coords.");
+        console.error(error);
     });
+}
+
+function saveMarkersToLocalStorage(){
+    localStorage.setItem("markers", JSON.stringify(markersArray.map(marker => ({
+        position: {
+            lat: marker.getPosition().lat(),
+            lng: marker.getPosition().lng()
+        },
+        title: marker.getTitle(),
+        icon: marker.getIcon().url
+    }))));
+}
+
+function loadMarkersFromLocalStorage() {
+    const storedMarkers = JSON.parse(localStorage.getItem("markers"));
+    if (storedMarkers && Array.isArray(storedMarkers)) {
+        storedMarkers.forEach(stored => {
+            const marker = new google.maps.Marker({
+                position: stored.position,
+                title: stored.title,
+                map: map,
+                icon: {
+                    url: stored.icon,
+                    scaledSize: new google.maps.Size(40, 40)
+                }
+            });
+
+            const infoWindow = new google.maps.InfoWindow({
+                content: `<strong>${stored.title}</strong>`
+            });
+            marker.addListener("click", () => infoWindow.open(map, marker));
+
+            markersArray.push(marker);
+        });
+    }
+}
+
+
+function deleteMarker(array){
+    array.forEach(marker => marker.setMap(null));
+    array.length = 0;
 }
