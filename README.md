@@ -61,7 +61,7 @@ Hemos insertado también los iconos para cada lugar elegido.
 ## Fuentes consultadas
 - Apuntes vistos en clases anteriores.
 - https://nominatim.openstreetmap.org/ui/search.html
-- 
+- https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage
 
 ## Decisiones técnicas
 - Decidimos repartir lod select por las esquines para dar más visibilidad al mapa estéticamente es mejor.
