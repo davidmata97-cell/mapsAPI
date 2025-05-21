@@ -82,7 +82,7 @@ function initMap(){
         document.getElementById('categoryFilter').value = "";
 
     });
-    
+
     document.getElementById('categoryFilter').addEventListener('change', () => {
         const category = document.getElementById('categoryFilter').value;
         filterMarkersByCategory(category);
@@ -105,6 +105,9 @@ function selectCity(){
     }
 
     showCityMarkers(cityData, map);
+    
+    const currentFilter = document.getElementById('categoryFilter').value;
+    filterMarkersByCategory(currentFilter);
 }
 
 //function used to show the city markers.
@@ -134,6 +137,8 @@ function showIcons(place){
             scaledSize: new google.maps.Size(40, 40)
         }
     });
+
+    marker.type = type;
 
     google.maps.event.addListener(marker, 'mouseover', function() {
         marker.setIcon({
@@ -223,7 +228,8 @@ function saveMarkersToLocalStorage(){
             lng: marker.getPosition().lng()
         },
         title: marker.getTitle(),
-        icon: marker.getIcon().url
+        icon: marker.getIcon().url,
+        type: marker.type
     }))));
 }
 
@@ -258,19 +264,15 @@ function deleteMarker(array){
     array.length = 0;
 }
 
+//function used to filter the markers by category
 function filterMarkersByCategory(category) {
     markersArray.forEach(marker => {
-        const type = extractTypeFromIcon(marker.getIcon().url);
+        const type = marker.type;
         marker.setVisible(category === "" || type === category);
     });
 
     cityMarkersArray.forEach(marker => {
-        const type = extractTypeFromIcon(marker.getIcon().url);
+        const type = marker.type;
         marker.setVisible(category === "" || type === category);
     });
-}
-
-function extractTypeFromIcon(url) {
-    const match = url.match(/\/([^\/]+)\.png$/);
-    return match ? match[1] : "";
 }
