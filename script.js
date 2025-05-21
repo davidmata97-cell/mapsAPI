@@ -53,13 +53,41 @@ function initMap(){
         zoom:6.5,
     });
 
-    document.getElementById('citySelector').addEventListener("change", selectCity);
+    const selector = document.getElementById('citySelector');
+    
+    let lastSelected = "";
+
+    selector.addEventListener("click", () => {
+        if (selector.value === lastSelected && selector.value !== "") {
+            selectCity(selector.value);
+        }
+    });
+
+    selector.addEventListener("change", () => {
+        lastSelected = selector.value;
+        selectCity(selector.value);
+    });
+
     document.getElementById('add').addEventListener('click', newMarker);
     document.getElementById('delete').addEventListener('click',  () => {
         deleteMarker(markersArray); 
         deleteMarker(cityMarkersArray);
         localStorage.removeItem("markers");
+
+        map.setCenter({ lat: 40, lng: -4 });
+        map.setZoom(6.5);
+
+        
+        document.getElementById('citySelector').value = "";
+        document.getElementById('categoryFilter').value = "";
+
     });
+    
+    document.getElementById('categoryFilter').addEventListener('change', () => {
+        const category = document.getElementById('categoryFilter').value;
+        filterMarkersByCategory(category);
+    });
+
 
     loadMarkersFromLocalStorage();
 
@@ -92,6 +120,7 @@ function showCityMarkers(cityData, map){
     });
 }
 
+//function used to show the diferent icons for each category
 function showIcons(place){
     const type = place.type && place.type.trim() !== "" ? place.type : "default";
     const iconUrl = `img/${type}.png`;
@@ -130,9 +159,9 @@ function showIcons(place){
     });
 
     return marker;
-
 }
 
+//function used to start a new marker
 function newMarker(){
     const location = document.getElementById('location').value;
     const category = document.getElementById('category').value;
@@ -142,11 +171,12 @@ function newMarker(){
         return;
     }
 
-    getCoords(location, category);
+    createMarker(location, category);
 
 }
 
-function getCoords(location, category){
+//function used to create a marker
+function createMarker(location, category){
     const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(location)}`;
 
     fetch(url, {
@@ -185,6 +215,7 @@ function getCoords(location, category){
     });
 }
 
+//function used to save the markers into the localStorage
 function saveMarkersToLocalStorage(){
     localStorage.setItem("markers", JSON.stringify(markersArray.map(marker => ({
         position: {
@@ -196,6 +227,7 @@ function saveMarkersToLocalStorage(){
     }))));
 }
 
+//function used to load the markers from the localStorage
 function loadMarkersFromLocalStorage() {
     const storedMarkers = JSON.parse(localStorage.getItem("markers"));
     if (storedMarkers && Array.isArray(storedMarkers)) {
@@ -220,8 +252,25 @@ function loadMarkersFromLocalStorage() {
     }
 }
 
-
+//function used to clean the map and delete all the markers
 function deleteMarker(array){
     array.forEach(marker => marker.setMap(null));
     array.length = 0;
+}
+
+function filterMarkersByCategory(category) {
+    markersArray.forEach(marker => {
+        const type = extractTypeFromIcon(marker.getIcon().url);
+        marker.setVisible(category === "" || type === category);
+    });
+
+    cityMarkersArray.forEach(marker => {
+        const type = extractTypeFromIcon(marker.getIcon().url);
+        marker.setVisible(category === "" || type === category);
+    });
+}
+
+function extractTypeFromIcon(url) {
+    const match = url.match(/\/([^\/]+)\.png$/);
+    return match ? match[1] : "";
 }

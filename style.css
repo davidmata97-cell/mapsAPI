@@ -15,13 +15,14 @@ html, body{
     z-index: 100;
     padding: 10px 15px;
     font-family: Arial, sans-serif;
+    border-radius: 5px;
 }
 
 #citySelector select {
     font-size: 16px;
     padding: 5px;
     border: 1px solid #ccc;
-    border-radius: 4px;
+    border-radius: 5px;
     min-width: 180px;
 }
 
@@ -32,13 +33,14 @@ html, body{
     z-index: 100;
     padding: 10px 15px;
     font-family: Arial, sans-serif;
+    border-radius: 5px;
 }
 
 #category select {
     font-size: 16px;
     padding: 5px;
     border: 1px solid #ccc;
-    border-radius: 4px;
+    border-radius: 5px;
     min-width: 180px;
 }
 
@@ -49,6 +51,7 @@ html, body{
     z-index: 100;
     padding: 10px 15px;
     font-family: Arial, sans-serif;
+    border-radius: 5px;
 }
 
 #add {
@@ -81,7 +84,7 @@ html, body{
 #delete {
     position: absolute;
     top: 10px;
-    left: 475px;
+    left: 480px;
     z-index: 100;
     padding: 10px 20px;
     font-family: Arial, sans-serif;
