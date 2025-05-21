@@ -10,7 +10,7 @@
 ## Soluciones aplicadas
 - 
 
-## Fuentes consultadas
+## Fuentes consultadas 
 - Apuntes vistos en clases anteriores
 
 ## Decisiones técnicas
