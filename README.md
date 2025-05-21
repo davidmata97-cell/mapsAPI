@@ -47,6 +47,9 @@ Hemos insertado también los iconos para cada lugar elegido.
 ## Ideas de mejora futura
 - Introducir los nombres de los markers al lado.
 
+
+
+
 # Sesión 3 Utilizar direcciones. 21/05/2025
 
 ## Resumen
