@@ -1,4 +1,6 @@
+var ubi;
 var markersArray = [];
+var cityMarkersArray = [];
 const citiesArray = {
     leon:    { lat: 42.5984, lng: -5.5725, zoom: 15, 
         places: [{name:"Cathedral",type:"church", lat:42.59944, lng:-5.56717}, 
@@ -69,8 +71,8 @@ function selectCity(map){
 
 //function used to show the city markers.
 function showCityMarkers(cityData, map){
-    markersArray.forEach(marker => marker.setMap(null));
-    markersArray = [];
+    cityMarkersArray.forEach(marker => marker.setMap(null));
+    cityMarkersArray = [];
 
     if (!cityData.places) return;
 
@@ -109,7 +111,10 @@ function showCityMarkers(cityData, map){
             });
         });
 
-        markersArray.push(marker);
+        cityMarkersArray.push(marker);
     });
+}
 
+function ubiText(){
+    ubi = document.getElementById('ubi').value;
 }
