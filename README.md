@@ -70,3 +70,28 @@ Hemos insertado también los iconos para cada lugar elegido.
 ## Ideas de mejora futura
 - Invertir la flecha del select.
 
+# Sesión 4  Obtener posiciones de forma dinámica. 22/05/2025 - 23/05/2025
+
+## Resumen
+- Hoy hemos añadido la caja de texto que permite introducir la dirección y un desplegable para establecer la categoría de la misma. Obtener las coordenadas de la dirección a través de OpenStreetMap, precisamente nominatim. Almacenamos la información de la ubicación en localstorage. Finalmente asignamos iconos a las ubicaciones. Y un botón de borrado.
+
+## Dificultades encontradas
+- Obtener las coordenadas OpenStreetMap.
+
+## Soluciones aplicadas
+- Usar la API nominatim de 
+
+## Fuentes consultadas
+- Apuntes vistos en clases anteriores.
+- https://developer.mozilla.org/es/docs/Web/API/XMLHttpRequest_API/Using_XMLHttpRequest
+- https://developer.mozilla.org/es/docs/Web/API/Fetch_API/Using_Fetch
+- https://developer.mozilla.org/es/docs/Web/API/DOMParser
+- https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/then
+
+## Decisiones técnicas
+- Decidimos repartir lod select por las esquines para dar más visibilidad al mapa estéticamente es mejor.
+- 
+
+## Ideas de mejora futura
+- Invertir la flecha del select.
+
