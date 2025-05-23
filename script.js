@@ -1,6 +1,12 @@
 var map;
+var earthquakeMarkers = [];
 var markersArray = [];
 var cityMarkersArray = [];
+var previousState = {
+    center: null,
+    zoom: null,
+    markers: [],
+};
 const citiesArray = {
     leon:    { lat: 42.5984, lng: -5.5725, zoom: 15, 
         places: [{name:"Cathedral",type:"church", lat:42.59944, lng:-5.56717}, 
@@ -88,6 +94,8 @@ function initMap(){
         filterMarkersByCategory(category);
     });
 
+    document.getElementById('earthquake').addEventListener('click', earthquakeMap);
+    document.getElementById('back').addEventListener('click', restoreMap);
 
     loadMarkersFromLocalStorage();
 
@@ -275,4 +283,102 @@ function filterMarkersByCategory(category) {
         const type = marker.type;
         marker.setVisible(category === "" || type === category);
     });
+}
+
+function earthquakeMap(){
+    saveMap();
+
+    document.getElementById('location').style.display = 'none';
+    document.getElementById('category').style.display = 'none';
+    document.getElementById('citySelector').style.display = 'none';
+    document.getElementById('add').style.display = 'none';
+    document.getElementById('delete').style.display = 'none';
+    document.getElementById('categoryFilter').style.display = 'none';
+    document.getElementById('earthquake').style.display = 'none';
+    document.getElementById('back').style.display = '';
+
+    [...markersArray, ...cityMarkersArray].forEach(marker => marker.setMap(null));
+
+    map.setCenter({ lat: 40, lng: -4 });
+    map.setZoom(5);
+
+    loadEarthquakeMap();
+}
+
+function loadEarthquakeMap(){
+    //fetch to catch the info from the url and then.then to work with promises 
+        fetch('https://www.ign.es/ign/RssTools/sismologia.xml')
+        .then(response => response.text()) //text to catch the text or JSON from an element
+        .then(data => {
+            console.log(data);
+            const parser = new DOMParser(); //to use a text chain from XML or HTML as DOM object
+            const xml = parser.parseFromString(data, "application/xml"); //to know taht it´s an XML
+            const items = xml.querySelectorAll("item");
+
+            items.forEach(item => {
+                let title = item.querySelector("title")?.textContent || "";
+                title = translateEarthquakeTitle(title);
+                const lat = item.getElementsByTagName("geo:lat")[0]?.textContent;
+                const lng = item.getElementsByTagName("geo:long")[0]?.textContent;
+
+
+                if (!isNaN(lat) && !isNaN(lng)) {
+                    const marker = new google.maps.Marker({
+                        position: {lat: parseFloat(lat), lng: parseFloat(lng)},
+                        map: map,
+                        icon: {
+                            url: "img/earthquake.png", 
+                            scaledSize: new google.maps.Size(40, 40)
+                        },
+                        title: title
+                    });
+                    earthquakeMarkers.push(marker);
+
+                    const infoWindow = new google.maps.InfoWindow({
+                        content: `<strong>${title}</strong>`
+                    });
+
+                    marker.addListener("click", () => infoWindow.open(map, marker));
+                    markersArray.push(marker);
+                }
+            });
+        })
+        .catch(err => {
+            alert("No se pudo cargar el XML de sismos.");
+            console.error(err);
+        });
+}
+
+function translateEarthquakeTitle(title) {
+    return title
+        .replace(/Terremoto/i, "Earthquake")
+}
+
+function restoreMap() {
+    deleteMarker(earthquakeMarkers);
+
+    document.getElementById('location').style.display = '';
+    document.getElementById('category').style.display = '';
+    document.getElementById('citySelector').style.display = '';
+    document.getElementById('add').style.display = '';
+    document.getElementById('delete').style.display = '';
+    document.getElementById('categoryFilter').style.display = '';
+    document.getElementById('earthquake').style.display = '';
+    document.getElementById('back').style.display = 'none';
+
+    previousState.markers.forEach(marker => marker.setMap(map));
+
+    [...markersArray, ...cityMarkersArray].forEach(marker => marker.setMap(null));
+    
+    previousState.markers.forEach(marker => marker.setMap(map));
+
+    map.setCenter(previousState.center);
+    map.setZoom(previousState.zoom);
+}
+
+
+function saveMap(){
+    previousState.center = map.getCenter();
+    previousState.zoom = map.getZoom();
+    previousState.markers = [...markersArray, ...cityMarkersArray];
 }
