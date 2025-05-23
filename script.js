@@ -1,6 +1,12 @@
 var map;
+var earthquakeMarkers = [];
 var markersArray = [];
 var cityMarkersArray = [];
+var previousState = {
+    center: null,
+    zoom: null,
+    markers: [],
+};
 const citiesArray = {
     leon:    { lat: 42.5984, lng: -5.5725, zoom: 15, 
         places: [{name:"Cathedral",type:"church", lat:42.59944, lng:-5.56717}, 
@@ -51,6 +57,16 @@ function initMap(){
     map = new google.maps.Map(document.getElementById("map"), {
         center: {lat: 40, lng: -4},
         zoom:6.5,
+        minZoom: 2,
+        restriction: {
+        latLngBounds: {
+            north: 85,
+            south: -85,
+            west: -180,
+            east: 180
+        },
+        strictBounds: true
+    }
     });
 
     const selector = document.getElementById('citySelector');
@@ -88,6 +104,8 @@ function initMap(){
         filterMarkersByCategory(category);
     });
 
+    document.getElementById('earthquake').addEventListener('click', earthquakeMap);
+    document.getElementById('back').addEventListener('click', restoreMap);
 
     loadMarkersFromLocalStorage();
 
@@ -248,6 +266,8 @@ function loadMarkersFromLocalStorage() {
                 }
             });
 
+            marker.type = stored.type;
+
             const infoWindow = new google.maps.InfoWindow({
                 content: `<strong>${stored.title}</strong>`
             });
@@ -274,5 +294,148 @@ function filterMarkersByCategory(category) {
     cityMarkersArray.forEach(marker => {
         const type = marker.type;
         marker.setVisible(category === "" || type === category);
+    });
+}
+
+//function used to load the page for earthquakes
+function earthquakeMap(){
+    saveMap();
+
+    document.getElementById('location').style.display = 'none';
+    document.getElementById('category').style.display = 'none';
+    document.getElementById('citySelector').style.display = 'none';
+    document.getElementById('add').style.display = 'none';
+    document.getElementById('delete').style.display = 'none';
+    document.getElementById('categoryFilter').style.display = 'none';
+    document.getElementById('earthquake').style.display = 'none';
+    document.getElementById('back').style.display = '';
+
+    [...markersArray, ...cityMarkersArray].forEach(marker => marker.setMap(null));
+
+    map.setCenter({ lat: 40, lng: -4 });
+    map.setZoom(5);
+
+    loadEarthquakeMap();
+}
+
+//function used to load the info of the earthquakes
+function loadEarthquakeMap(){
+    //fetch to catch the info from the url and then.then to work with promises 
+        fetch('https://www.ign.es/ign/RssTools/sismologia.xml')
+        .then(response => response.text()) //text to catch the text or JSON from an element
+        .then(data => {
+            console.log(data);
+            const parser = new DOMParser(); //to use a text chain from XML or HTML as DOM object
+            const xml = parser.parseFromString(data, "application/xml"); //to know that it´s an XML
+            const items = xml.querySelectorAll("item");
+
+           loadEarthquakeMarker(items);
+
+            document.getElementById('magnitudeFilter').style.display = '';
+            document.getElementById('magnitudeFilter').addEventListener('change', () => {
+                const selected = document.getElementById('magnitudeFilter').value;
+                filterEarthquakeMarkersByMagnitude(selected);
+            });
+
+
+        })
+        .catch(err => {
+            alert("No se pudo cargar el XML de sismos.");
+            console.error(err);
+        });
+}
+
+//function used to load the earthquakes markers
+function loadEarthquakeMarker(items){
+     items.forEach(item => {
+                let title = item.querySelector("title")?.textContent || "";
+                title = translateEarthquakeTitle(title);
+                const lat = item.getElementsByTagName("geo:lat")[0]?.textContent;
+                const lng = item.getElementsByTagName("geo:long")[0]?.textContent;
+                const description = item.querySelector("description")?.textContent || "";
+                const magnitude = parseMagnitudeFromDescription(description);
+                const type = magnitude < 2.0 ? "micro" :
+                magnitude < 4.0 ? "minor" : "light";
+
+                if (!isNaN(lat) && !isNaN(lng)) {
+                    const iconUrl = getEarthquakeIcon(magnitude);
+
+                    const marker = new google.maps.Marker({
+                        position: {lat: parseFloat(lat), lng: parseFloat(lng)},
+                        map: map,
+                        icon: {
+                            url: iconUrl, 
+                            scaledSize: new google.maps.Size(40, 40)
+                        },
+                        title: title
+                    });
+                    marker.type = type;
+                    marker.magnitude = magnitude;
+
+                    earthquakeMarkers.push(marker);
+
+                    const infoWindow = new google.maps.InfoWindow({
+                        content: `<strong>${title}</strong>`
+                    });
+
+                    marker.addListener("click", () => infoWindow.open(map, marker));
+                }
+            });
+}
+
+//function used to search for the magnitude
+function parseMagnitudeFromDescription(description) {
+    const match = description.match(/magnitud\s*(\d+(\.\d+)?)/i);
+    return match ? parseFloat(match[1]) : 0;
+}
+
+//function used to search for the correct icon
+function getEarthquakeIcon(magnitude) {
+    if (magnitude < 2.0) return "img/earthquake_micro.png";
+    else if (magnitude < 4.0) return "img/earthquake_minor.png";
+    else return "img/earthquake_light.png";
+}
+
+//funtion used to translate the title of the earthquake
+function translateEarthquakeTitle(title) {
+    return title
+        .replace(/Terremoto/i, "Earthquake")
+}
+
+//function used to restore the map
+function restoreMap() {
+    deleteMarker(earthquakeMarkers);
+
+    document.getElementById('location').style.display = '';
+    document.getElementById('category').style.display = '';
+    document.getElementById('citySelector').style.display = '';
+    document.getElementById('add').style.display = '';
+    document.getElementById('delete').style.display = '';
+    document.getElementById('categoryFilter').style.display = '';
+    document.getElementById('earthquake').style.display = '';
+    document.getElementById('back').style.display = 'none';
+    document.getElementById('magnitudeFilter').style.display = 'none';
+
+    previousState.markers.forEach(marker => marker.setMap(map));
+
+    [...markersArray, ...cityMarkersArray].forEach(marker => marker.setMap(null));
+    
+    previousState.markers.forEach(marker => marker.setMap(map));
+
+    map.setCenter(previousState.center);
+    map.setZoom(previousState.zoom);
+}
+
+//function used to save the map as it is at a specific moment
+function saveMap(){
+    previousState.center = map.getCenter();
+    previousState.zoom = map.getZoom();
+    previousState.markers = [...markersArray, ...cityMarkersArray];
+}
+
+//function used to search for a specific range of magnitude
+function filterEarthquakeMarkersByMagnitude(type) {
+    earthquakeMarkers.forEach(marker => {
+        marker.setVisible(type === "" || marker.type === type);
     });
 }

@@ -70,3 +70,29 @@ Hemos insertado también los iconos para cada lugar elegido.
 ## Ideas de mejora futura
 - Invertir la flecha del select.
 
+# Sesión 4  Obtener posiciones de forma dinámica. 22/05/2025 - 23/05/2025
+
+## Resumen
+- Hoy hemos añadido la funcionalidad de recoger y mostrar en una pantalla nueva las localizaciones almacenadas en un xml. En este caso eran los terremeotos acaecidos en España en los últimos 10 días. Lo hemos decidido mostrar en una pantalla diferente y sin los iconos del resto de las ubicaciones buscadas con anterioridad. Luego hicimos una clasificación por magnitudes asignando un color a cada rango de magnitud.
+
+## Dificultades encontradas
+- En un primer momento no mostraba los marcadores de terremoto.
+- Tomar de un nodo xml que es solo texto una parte excluyendo el resto del mismo.
+
+## Soluciones aplicadas
+- Comprobar el codigo de implementación.
+- Guardar en una variable y utilizar el catch.
+
+## Fuentes consultadas
+- Apuntes vistos en clases anteriores.
+- https://developer.mozilla.org/es/docs/Web/API/XMLHttpRequest_API/Using_XMLHttpRequest
+- https://developer.mozilla.org/es/docs/Web/API/Fetch_API/Using_Fetch
+- https://developer.mozilla.org/es/docs/Web/API/DOMParser
+- https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/then
+
+## Decisiones técnicas
+- Para utilizar los datos de la magnitud desde el XML y mostrarlos en nuestra aplicación se decidió guardar en una variable y utilizar el catch.
+
+## Ideas de mejora futura
+
+
