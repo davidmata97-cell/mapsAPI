@@ -324,10 +324,18 @@ function loadEarthquakeMap(){
         .then(data => {
             console.log(data);
             const parser = new DOMParser(); //to use a text chain from XML or HTML as DOM object
-            const xml = parser.parseFromString(data, "application/xml"); //to know taht it´s an XML
+            const xml = parser.parseFromString(data, "application/xml"); //to know that it´s an XML
             const items = xml.querySelectorAll("item");
 
-           loadEarthquakesMarker(items);
+           loadEarthquakeMarker(items);
+
+            document.getElementById('magnitudeFilter').style.display = '';
+            document.getElementById('magnitudeFilter').addEventListener('change', () => {
+                const selected = document.getElementById('magnitudeFilter').value;
+                filterEarthquakeMarkersByMagnitude(selected);
+            });
+
+
         })
         .catch(err => {
             alert("No se pudo cargar el XML de sismos.");
@@ -336,24 +344,32 @@ function loadEarthquakeMap(){
 }
 
 //function used to load the earthquakes markers
-function loadEarthquakesMarker(items){
+function loadEarthquakeMarker(items){
      items.forEach(item => {
                 let title = item.querySelector("title")?.textContent || "";
                 title = translateEarthquakeTitle(title);
                 const lat = item.getElementsByTagName("geo:lat")[0]?.textContent;
                 const lng = item.getElementsByTagName("geo:long")[0]?.textContent;
-
+                const description = item.querySelector("description")?.textContent || "";
+                const magnitude = parseMagnitudeFromDescription(description);
+                const type = magnitude < 2.0 ? "micro" :
+                magnitude < 4.0 ? "minor" : "light";
 
                 if (!isNaN(lat) && !isNaN(lng)) {
+                    const iconUrl = getEarthquakeIcon(magnitude);
+
                     const marker = new google.maps.Marker({
                         position: {lat: parseFloat(lat), lng: parseFloat(lng)},
                         map: map,
                         icon: {
-                            url: "img/earthquake.png", 
+                            url: iconUrl, 
                             scaledSize: new google.maps.Size(40, 40)
                         },
                         title: title
                     });
+                    marker.type = type;
+                    marker.magnitude = magnitude;
+                    
                     earthquakeMarkers.push(marker);
 
                     const infoWindow = new google.maps.InfoWindow({
@@ -363,6 +379,19 @@ function loadEarthquakesMarker(items){
                     marker.addListener("click", () => infoWindow.open(map, marker));
                 }
             });
+}
+
+//function used to search for the magnitude
+function parseMagnitudeFromDescription(description) {
+    const match = description.match(/magnitud\s*(\d+(\.\d+)?)/i);
+    return match ? parseFloat(match[1]) : 0;
+}
+
+//function used to search for the correct icon
+function getEarthquakeIcon(magnitude) {
+    if (magnitude < 2.0) return "img/earthquake_micro.png";
+    else if (magnitude < 4.0) return "img/earthquake_minor.png";
+    else return "img/earthquake_light.png";
 }
 
 //funtion used to translate the title of the earthquake
@@ -383,6 +412,7 @@ function restoreMap() {
     document.getElementById('categoryFilter').style.display = '';
     document.getElementById('earthquake').style.display = '';
     document.getElementById('back').style.display = 'none';
+    document.getElementById('magnitudeFilter').style.display = 'none';
 
     previousState.markers.forEach(marker => marker.setMap(map));
 
@@ -399,4 +429,11 @@ function saveMap(){
     previousState.center = map.getCenter();
     previousState.zoom = map.getZoom();
     previousState.markers = [...markersArray, ...cityMarkersArray];
+}
+
+//function used to search for a specific range of magnitude
+function filterEarthquakeMarkersByMagnitude(type) {
+    earthquakeMarkers.forEach(marker => {
+        marker.setVisible(type === "" || marker.type === type);
+    });
 }
