@@ -73,10 +73,12 @@ Hemos insertado también los iconos para cada lugar elegido.
 # Sesión 4  Obtener posiciones de forma dinámica. 22/05/2025 - 23/05/2025
 
 ## Resumen
-- Hoy hemos añadido la caja de texto que permite introducir la dirección y un desplegable para establecer la categoría de la misma. Obtener las coordenadas de la dirección a través de OpenStreetMap, precisamente nominatim. Almacenamos la información de la ubicación en localstorage. Finalmente asignamos iconos a las ubicaciones. Y un botón de borrado.
+- Hoy hemos añadido la funcionalidad de recoger y mostrar en una pantalla nueva las localizaciones almacenadas en un xml. En este caso eran los terremeotos acaecidos en España en los últimos 10 días. Lo hemos decidido mostrar en una pantalla diferente y sin los iconos del resto de las ubicaciones buscadas con anterioridad. Luego hicimos una clasificación por magnitudes asignando un color a cada rango de magnitud.
 
 ## Dificultades encontradas
-- Obtener las coordenadas OpenStreetMap.
+- En un primer momento no mostraba los marcadores de terremoto.
+- Tomar de un nodo xml que es solo texto una parte excluyendo el resto del mismo.
+- 
 
 ## Soluciones aplicadas
 - Usar la API nominatim de 
