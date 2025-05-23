@@ -152,3 +152,31 @@ html, body{
     background-color: rgb(250, 169, 83);
     transform: translateY(1px); 
 }
+
+#back{
+    position: absolute;
+    top: 10px;
+    left: 20px;
+    z-index: 100;
+    padding: 10px 20px;
+    font-family: Arial, sans-serif;
+    background-color: rgb(122, 122, 121);
+    color: black;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s, transform 0.2s;
+
+}
+
+#back:hover {
+    background-color: rgb(80, 80, 80);
+    transform: translateY(-2px);
+}
+
+#back:active {
+    background-color: rgb(61, 62, 61); 
+    transform: translateY(1px); 
+}
