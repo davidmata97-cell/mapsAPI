@@ -91,9 +91,9 @@ Hemos insertado también los iconos para cada lugar elegido.
 - https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/then
 
 ## Decisiones técnicas
-- Decidimos repartir lod select por las esquines para dar más visibilidad al mapa estéticamente es mejor.
+- 
 - 
 
 ## Ideas de mejora futura
-- Invertir la flecha del select.
+- .
 
