@@ -339,7 +339,6 @@ function loadEarthquakeMap(){
                     });
 
                     marker.addListener("click", () => infoWindow.open(map, marker));
-                    markersArray.push(marker);
                 }
             });
         })
