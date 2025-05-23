@@ -57,6 +57,16 @@ function initMap(){
     map = new google.maps.Map(document.getElementById("map"), {
         center: {lat: 40, lng: -4},
         zoom:6.5,
+        minZoom: 2,
+        restriction: {
+        latLngBounds: {
+            north: 85,
+            south: -85,
+            west: -180,
+            east: 180
+        },
+        strictBounds: true
+    }
     });
 
     const selector = document.getElementById('citySelector');
@@ -285,6 +295,7 @@ function filterMarkersByCategory(category) {
     });
 }
 
+//function used to load the page for earthquakes
 function earthquakeMap(){
     saveMap();
 
@@ -305,6 +316,7 @@ function earthquakeMap(){
     loadEarthquakeMap();
 }
 
+//function used to load the info of the earthquakes
 function loadEarthquakeMap(){
     //fetch to catch the info from the url and then.then to work with promises 
         fetch('https://www.ign.es/ign/RssTools/sismologia.xml')
@@ -315,7 +327,17 @@ function loadEarthquakeMap(){
             const xml = parser.parseFromString(data, "application/xml"); //to know taht it´s an XML
             const items = xml.querySelectorAll("item");
 
-            items.forEach(item => {
+           loadEarthquakesMarker(items);
+        })
+        .catch(err => {
+            alert("No se pudo cargar el XML de sismos.");
+            console.error(err);
+        });
+}
+
+//function used to load the earthquakes markers
+function loadEarthquakesMarker(items){
+     items.forEach(item => {
                 let title = item.querySelector("title")?.textContent || "";
                 title = translateEarthquakeTitle(title);
                 const lat = item.getElementsByTagName("geo:lat")[0]?.textContent;
@@ -341,18 +363,15 @@ function loadEarthquakeMap(){
                     marker.addListener("click", () => infoWindow.open(map, marker));
                 }
             });
-        })
-        .catch(err => {
-            alert("No se pudo cargar el XML de sismos.");
-            console.error(err);
-        });
 }
 
+//funtion used to translate the title of the earthquake
 function translateEarthquakeTitle(title) {
     return title
         .replace(/Terremoto/i, "Earthquake")
 }
 
+//function used to restore the map
 function restoreMap() {
     deleteMarker(earthquakeMarkers);
 
@@ -375,7 +394,7 @@ function restoreMap() {
     map.setZoom(previousState.zoom);
 }
 
-
+//function used to save the map as it is at a specific moment
 function saveMap(){
     previousState.center = map.getCenter();
     previousState.zoom = map.getZoom();
