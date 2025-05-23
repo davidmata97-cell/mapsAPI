@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" type="text/css" href="style.css"/>
+    <link rel="icon" type="image/png" href="img/default.png"/>
     <title>Map</title>
 </head>
 <body>
@@ -22,6 +23,7 @@
         <input type="text" id="location" placeholder="Introduce a location"/>
         <select id="category">
             <option value="" disabled selected="true">Select a category</option>
+            <option value="default">Default</option>
             <option value="city">City</option>
             <option value="monument">Monument</option>
             <option value="castle">Castle</option>
@@ -37,7 +39,7 @@
     </div>
     <div id="filter">
         <select id="categoryFilter">
-            <option value="">-- Show All --</option>
+            <option value="" disabled selected>-- Show All --</option>
             <option value="default">Default</option>
             <option value="city">City</option>
             <option value="church">Church</option>
