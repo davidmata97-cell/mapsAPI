@@ -78,10 +78,10 @@ Hemos insertado también los iconos para cada lugar elegido.
 ## Dificultades encontradas
 - En un primer momento no mostraba los marcadores de terremoto.
 - Tomar de un nodo xml que es solo texto una parte excluyendo el resto del mismo.
-- 
 
 ## Soluciones aplicadas
-- Usar la API nominatim de 
+- Comprobar el codigo de implementación.
+- Guardar en una variable y utilizar el catch.
 
 ## Fuentes consultadas
 - Apuntes vistos en clases anteriores.
@@ -91,9 +91,8 @@ Hemos insertado también los iconos para cada lugar elegido.
 - https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/then
 
 ## Decisiones técnicas
-- 
-- 
+- Para utilizar los datos de la magnitud desde el XML y mostrarlos en nuestra aplicación se decidió guardar en una variable y utilizar el catch.
 
 ## Ideas de mejora futura
-- .
+
 
