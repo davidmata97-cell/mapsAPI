@@ -122,14 +122,14 @@ function selectCity(){
         map.setZoom(cityData.zoom);
     }
 
-    showCityMarkers(cityData, map);
+    showCityMarkers(cityData);
     
     const currentFilter = document.getElementById('categoryFilter').value;
     filterMarkersByCategory(currentFilter);
 }
 
 //function used to show the city markers.
-function showCityMarkers(cityData, map){
+function showCityMarkers(cityData){
     deleteMarker(cityMarkersArray);
 
     if (!cityData.places) return;
@@ -347,7 +347,7 @@ function loadEarthquakeMap(){
 
 //function used to load the earthquakes markers
 function loadEarthquakeMarker(items){
-     items.forEach(item => {
+    items.forEach(item => {
                 let title = item.querySelector("title")?.textContent || "";
                 title = translateEarthquakeTitle(title);
                 const lat = item.getElementsByTagName("geo:lat")[0]?.textContent;
@@ -380,7 +380,7 @@ function loadEarthquakeMarker(items){
 
                     marker.addListener("click", () => infoWindow.open(map, marker));
                 }
-            });
+    });
 }
 
 //function used to search for the magnitude
